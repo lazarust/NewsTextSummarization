@@ -1,1 +1,1 @@
-# NewsTextSummarization
+# News Text Summarization
