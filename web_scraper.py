@@ -15,6 +15,7 @@ class Scraper:
         'wired_ideas': 'https://www.wired.com/feed/category/ideas/latest/rss',
         'wired_science': 'https://www.wired.com/feed/category/science/latest/rss',
         'huffpost': 'https://www.huffpost.com/section/front-page/feed?x=1',
+        'cnet': 'https://www.cnet.com/rss/news/',
     }
 
     verge_dict = {}
@@ -22,6 +23,7 @@ class Scraper:
     independent_dict = {}
     wired_dict = {}
     huffpost_dict = {}
+    cnet_dict = {}
 
     article_to_dict = {
         'verge': verge_dict,
@@ -33,6 +35,7 @@ class Scraper:
         'wired_ideas': wired_dict,
         'wired_science': wired_dict,
         'huffpost': huffpost_dict,
+        'cnet': cnet_dict,
     }
 
     not_allowed_urls = ['https://www.nytimes.com', 'https://www.nytimes.com/section/us', 'https://www.wired.com']
@@ -47,7 +50,7 @@ class Scraper:
             soup = BeautifulSoup(res.text, 'xml')
 
             for art in soup.findAll('link')[1:]:
-                if site.split('_')[0] == 'nyTimes' or site.split('_')[0] == 'wired' or site == 'huffpost':
+                if site != 'verge':
                     for x in art:
                         art_link = x
                 else:
@@ -64,13 +67,14 @@ class Scraper:
     def get_specific_site_articles(self, slug=None):
         if slug:
             return self.article_to_dict[slug]
+        else:
+            print("ERROR: Please Enter Slug")
 
     def get_all_site_articles(self):
         return self.article_to_dict
 
-    def get_all_sites(self):
-        list = []
-        for x in self.link_dict:
-            list.append(x)
-
-        return list
+    def get_all_site_slugs(self):
+        slug_list = []
+        for slug in self.link_dict:
+            slug_list.append(slug)
+        return slug_list
