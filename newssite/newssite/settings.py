@@ -53,7 +53,7 @@ ROOT_URLCONF = 'newssite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'newssite/apps/news/templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'newssite/apps/summarizer/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
