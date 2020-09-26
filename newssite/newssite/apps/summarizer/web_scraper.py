@@ -1,7 +1,21 @@
 import requests
+import nltk
 
+from nltk.corpus import stopwords
 from bs4 import BeautifulSoup
 from newspaper import Article
+
+nltk.download('stopwords')
+
+
+def clean_article_text(article):
+    stoplist = stopwords.words('english')
+    clean_word_list = [word for word in article.split() if word not in stoplist]
+    clean_src_text = ""
+    for x in clean_word_list:
+        clean_src_text = clean_src_text + x + " "
+
+    return clean_src_text
 
 
 class Scraper:
@@ -9,7 +23,6 @@ class Scraper:
         'verge': 'https://www.theverge.com/rss/index.xml',
         'nyTimes_Home': 'https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml',
         'nyTimes_US': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
-        'independent': 'https://www.independent.co.uk/news/world/rss',
         'wired_main': 'https://www.wired.com/feed/rss',
         'wired_backchannel': 'https://www.wired.com/feed/category/backchannel/latest/rss',
         'wired_ideas': 'https://www.wired.com/feed/category/ideas/latest/rss',
@@ -20,7 +33,6 @@ class Scraper:
 
     verge_dict = {}
     nyTime_dict = {}
-    independent_dict = {}
     wired_dict = {}
     huffpost_dict = {}
     cnet_dict = {}
@@ -29,7 +41,6 @@ class Scraper:
         'verge': verge_dict,
         'nyTimes_Home': nyTime_dict,
         'nyTimes_US': nyTime_dict,
-        'independent': independent_dict,
         'wired_main': wired_dict,
         'wired_backchannel': wired_dict,
         'wired_ideas': wired_dict,
@@ -38,10 +49,11 @@ class Scraper:
         'cnet': cnet_dict,
     }
 
-    not_allowed_urls = ['https://www.nytimes.com', 'https://www.nytimes.com/section/us', 'https://www.wired.com']
+    not_allowed_urls = ['https://www.nytimes.com', 'https://www.nytimes.com/section/us', 'https://www.wired.com', 'https://www.cnet.com/#ftag=CAD590a51e']
 
     def scrape_all_articles(self):
         for site in self.link_dict:
+            print(f'Started Scraping {site}')
             link = self.link_dict[site]
             res = requests.get(link)
             if res.status_code == 404:
@@ -60,9 +72,11 @@ class Scraper:
                         article = Article(art_link)
                         article.download()
                         article.parse()
-                        self.article_to_dict[site][article.title] = (article.text, art_link)
+                        self.article_to_dict[site][article.title] = {'article': clean_article_text(article.text), 'link': art_link}
                     except:
                         print(f'ERROR: {art_link}')
+
+            print(f'Finished Scraping {site}')
 
     def get_specific_site_articles(self, slug=None):
         if slug:
