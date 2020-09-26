@@ -5,8 +5,6 @@ from nltk.corpus import stopwords
 from bs4 import BeautifulSoup
 from newspaper import Article
 
-nltk.download('stopwords')
-
 
 def clean_article_text(article):
     stoplist = stopwords.words('english')
@@ -21,8 +19,8 @@ def clean_article_text(article):
 class Scraper:
     link_dict = {
         'verge': 'https://www.theverge.com/rss/index.xml',
-        'nyTimes_Home': 'https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml',
-        'nyTimes_US': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
+        # 'nyTimes_Home': 'https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml',
+        # 'nyTimes_US': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
         'wired_main': 'https://www.wired.com/feed/rss',
         'wired_backchannel': 'https://www.wired.com/feed/category/backchannel/latest/rss',
         'wired_ideas': 'https://www.wired.com/feed/category/ideas/latest/rss',
@@ -32,15 +30,15 @@ class Scraper:
     }
 
     verge_dict = {}
-    nyTime_dict = {}
+    # nyTime_dict = {}
     wired_dict = {}
     huffpost_dict = {}
     cnet_dict = {}
 
     article_to_dict = {
         'verge': verge_dict,
-        'nyTimes_Home': nyTime_dict,
-        'nyTimes_US': nyTime_dict,
+        # 'nyTimes_Home': nyTime_dict,
+        # 'nyTimes_US': nyTime_dict,
         'wired_main': wired_dict,
         'wired_backchannel': wired_dict,
         'wired_ideas': wired_dict,
@@ -92,3 +90,9 @@ class Scraper:
         for slug in self.link_dict:
             slug_list.append(slug)
         return slug_list
+
+    def __init__(self):
+        print("Start Downloading")
+        nltk.download('stopwords')
+        print("FINISHED Downloading")
+        super().__init__()

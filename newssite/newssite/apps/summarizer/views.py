@@ -2,8 +2,6 @@ from django.views.generic import TemplateView
 from .web_scraper import Scraper
 import schedule
 
-site_articles = {}
-
 
 class NewsList(TemplateView):
     template_name = 'news_list.html'
@@ -21,4 +19,4 @@ class NewsList(TemplateView):
         return context
 
     def get_arts(self):
-        self.s.scrape_all_articles()
+        self.site_articles = self.s.scrape_all_articles()

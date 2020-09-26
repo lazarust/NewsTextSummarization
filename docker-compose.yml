@@ -2,9 +2,11 @@ version: "3.8"
 
 services:
   newssite:
-    build: .
+    build:
+      context: .
     ports:
       - "8000:8000"
     volumes:
       - ./newssite:/newssite
-    command: python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "python manage.py runserver 0.0.0.0:8000"

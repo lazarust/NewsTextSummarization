@@ -1,11 +1,13 @@
-FROM python:3.7-slim-stretch
+FROM python:3-slim-buster
 MAINTAINER Thomas Lazarus (Github: lazarust)
 
 ENV PYTHONUNUNBUFFERED 1
 
+RUN mkdir /newssite
+WORKDIR /newssite
+
 COPY ./requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
 
-RUN mkdir /newssite
-WORKDIR /newssite
-COPY ./newssite /newssite
+COPY ./.newsite /newssite
+CMD ['python']
