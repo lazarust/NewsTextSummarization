@@ -8,10 +8,14 @@
 </head>
 <body>
 <div class="row">
-    {%  for site, article in arts.items %}
+    {%  for site, headline_dict in arts.items %}
         <div class="col">
             <h3>{{ site }}</h3>
-            {{ article }}
+            {%  for headline, link_dict in headline_dict.items %}
+                <a href="{{ link_dict.link }}">{{ headline }}</a>
+                {{ link_dict.article_loc }}
+                <br/>
+            {%  endfor %}
         </div>
     {% endfor %}
 </div>

@@ -19,37 +19,38 @@ def clean_article_text(article):
 class Scraper:
     link_dict = {
         'verge': 'https://www.theverge.com/rss/index.xml',
-        # 'nyTimes_Home': 'https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml',
-        # 'nyTimes_US': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
+        'nyTimes_Home': 'https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml',
+        'nyTimes_US': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
         'wired_main': 'https://www.wired.com/feed/rss',
         'wired_backchannel': 'https://www.wired.com/feed/category/backchannel/latest/rss',
         'wired_ideas': 'https://www.wired.com/feed/category/ideas/latest/rss',
         'wired_science': 'https://www.wired.com/feed/category/science/latest/rss',
-        'huffpost': 'https://www.huffpost.com/section/front-page/feed?x=1',
         'cnet': 'https://www.cnet.com/rss/news/',
     }
 
     verge_dict = {}
-    # nyTime_dict = {}
+    nyTime_dict = {}
     wired_dict = {}
-    huffpost_dict = {}
     cnet_dict = {}
 
     article_to_dict = {
         'verge': verge_dict,
-        # 'nyTimes_Home': nyTime_dict,
-        # 'nyTimes_US': nyTime_dict,
+        'nyTimes_Home': nyTime_dict,
+        'nyTimes_US': nyTime_dict,
         'wired_main': wired_dict,
         'wired_backchannel': wired_dict,
         'wired_ideas': wired_dict,
         'wired_science': wired_dict,
-        'huffpost': huffpost_dict,
         'cnet': cnet_dict,
     }
 
-    not_allowed_urls = ['https://www.nytimes.com', 'https://www.nytimes.com/section/us', 'https://www.wired.com', 'https://www.cnet.com/#ftag=CAD590a51e']
+    articles = []
+
+    not_allowed_urls = ['https://www.nytimes.com', 'https://www.nytimes.com/section/us', 'https://www.wired.com',
+                        'https://www.cnet.com/#ftag=CAD590a51e']
 
     def scrape_all_articles(self):
+        i = 0
         for site in self.link_dict:
             print(f'Started Scraping {site}')
             link = self.link_dict[site]
@@ -70,11 +71,16 @@ class Scraper:
                         article = Article(art_link)
                         article.download()
                         article.parse()
-                        self.article_to_dict[site][article.title] = {'article': clean_article_text(article.text), 'link': art_link}
+                        self.articles.append(clean_article_text(article.text))
+                        self.article_to_dict[site][article.title] = {'link': art_link, 'article_loc': i}
+                        i += 1
                     except:
                         print(f'ERROR: {art_link}')
 
             print(f'Finished Scraping {site}')
+
+        # TODO Move this to after the articles are summarized
+        self.update_articles_in_dict()
 
     def get_specific_site_articles(self, slug=None):
         if slug:
@@ -96,3 +102,11 @@ class Scraper:
         nltk.download('stopwords')
         print("FINISHED Downloading")
         super().__init__()
+
+    def update_articles_in_dict(self):
+        for site, headline_dict in self.article_to_dict.items():
+            for headline, link_dict in headline_dict.items():
+                if isinstance(link_dict['article_loc'], int):
+                    link_dict.update({
+                        'article_loc': self.articles[link_dict['article_loc']]
+                    })
