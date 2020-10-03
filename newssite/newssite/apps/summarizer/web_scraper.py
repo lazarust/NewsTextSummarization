@@ -1,20 +1,7 @@
 import requests
-import nltk
 
-from nltk.corpus import stopwords
 from bs4 import BeautifulSoup
 from newspaper import Article
-
-
-def clean_article_text(article):
-    stoplist = stopwords.words('english')
-    clean_word_list = [word for word in article.split() if word not in stoplist]
-    clean_src_text = ""
-    for x in clean_word_list:
-        clean_src_text = clean_src_text + x + " "
-
-    return clean_src_text
-
 
 class Scraper:
     link_dict = {
@@ -71,7 +58,7 @@ class Scraper:
                         article = Article(art_link)
                         article.download()
                         article.parse()
-                        self.articles.append(clean_article_text(article.text))
+                        self.articles.append(article.text)
                         self.article_to_dict[site][article.title] = {'link': art_link, 'article_loc': i}
                         i += 1
                     except:
@@ -96,12 +83,6 @@ class Scraper:
         for slug in self.link_dict:
             slug_list.append(slug)
         return slug_list
-
-    def __init__(self):
-        print("Start Downloading")
-        nltk.download('stopwords')
-        print("FINISHED Downloading")
-        super().__init__()
 
     def update_articles_in_dict(self):
         for site, headline_dict in self.article_to_dict.items():
