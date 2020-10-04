@@ -3,10 +3,10 @@ import requests
 from bs4 import BeautifulSoup
 from newspaper import Article
 
+
 class Scraper:
     link_dict = {
         'verge': 'https://www.theverge.com/rss/index.xml',
-        'nyTimes_Home': 'https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml',
         'nyTimes_US': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
         'wired_main': 'https://www.wired.com/feed/rss',
         'wired_backchannel': 'https://www.wired.com/feed/category/backchannel/latest/rss',
@@ -22,7 +22,6 @@ class Scraper:
 
     article_to_dict = {
         'verge': verge_dict,
-        'nyTimes_Home': nyTime_dict,
         'nyTimes_US': nyTime_dict,
         'wired_main': wired_dict,
         'wired_backchannel': wired_dict,
