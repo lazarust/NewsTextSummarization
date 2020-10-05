@@ -1,7 +1,9 @@
 import requests
+import time
 
 from bs4 import BeautifulSoup
 from newspaper import Article
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 
 class Scraper:
@@ -9,9 +11,6 @@ class Scraper:
         'verge': 'https://www.theverge.com/rss/index.xml',
         'nyTimes_US': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
         'wired_main': 'https://www.wired.com/feed/rss',
-        'wired_backchannel': 'https://www.wired.com/feed/category/backchannel/latest/rss',
-        'wired_ideas': 'https://www.wired.com/feed/category/ideas/latest/rss',
-        'wired_science': 'https://www.wired.com/feed/category/science/latest/rss',
         'cnet': 'https://www.cnet.com/rss/news/',
     }
 
@@ -24,9 +23,6 @@ class Scraper:
         'verge': verge_dict,
         'nyTimes_US': nyTime_dict,
         'wired_main': wired_dict,
-        'wired_backchannel': wired_dict,
-        'wired_ideas': wired_dict,
-        'wired_science': wired_dict,
         'cnet': cnet_dict,
     }
 
@@ -34,6 +30,10 @@ class Scraper:
 
     not_allowed_urls = ['https://www.nytimes.com', 'https://www.nytimes.com/section/us', 'https://www.wired.com',
                         'https://www.cnet.com/#ftag=CAD590a51e']
+
+    tokenizer = AutoTokenizer.from_pretrained("google/pegasus-cnn_dailymail", use_fast=True)
+    # Make sure the file is unzipped
+    model = AutoModelForSeq2SeqLM.from_pretrained("apps/summarizer/model", local_files_only=True)
 
     def scrape_all_articles(self):
         i = 0
@@ -65,7 +65,7 @@ class Scraper:
 
             print(f'Finished Scraping {site}')
 
-        # TODO Move this to after the articles are summarized
+        self.summarize()
         self.update_articles_in_dict()
 
     def get_specific_site_articles(self, slug=None):
@@ -90,3 +90,14 @@ class Scraper:
                     link_dict.update({
                         'article_loc': self.articles[link_dict['article_loc']]
                     })
+
+    def summarize(self):
+        print("Start Summarizing")
+        start_time = time.time()
+        batch = self.tokenizer.prepare_seq2seq_batch(self.articles, max_target_length=100, padding='longest', truncation=True)
+        translated = self.model.generate(max_length=2, early_stopping=True, **batch)
+        tgt_text = self.tokenizer.batch_decode(translated, skip_special_tokens=True)
+        end_time = time.time()
+        time_diff = end_time - start_time
+        self.articles = tgt_text
+        print(f'TIME: {time_diff}')

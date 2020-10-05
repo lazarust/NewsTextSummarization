@@ -1,4 +1,4 @@
-FROM python:3-slim-buster
+FROM python:3-buster
 MAINTAINER Thomas Lazarus (Github: lazarust)
 
 ENV PYTHONUNUNBUFFERED 1
