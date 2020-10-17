@@ -6,7 +6,25 @@ services:
       context: .
     ports:
       - "8000:8000"
+      - "4040:4040"
+      - "4041:4041"
     volumes:
       - ./newssite:/newssite
-    command: >
-      sh -c "python manage.py runserver 0.0.0.0:8000"
+    command: python manage.py runserver 0.0.0.0:8000
+    restart: always
+  spark-master:
+    image: bde2020/spark-master:3.0.0-hadoop3.2
+    container_name: spark-master
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    environment:
+      - INIT_DAEMON_STEP=setup_spark
+      - "constraint:node==<yourmasternode>"
+  py-spark:
+    build: .
+    depends_on:
+      - spark-master
+    environment:
+      - ENABLE_INIT_DAEMON=false
+      - "SPARK_MASTER=spark://spark-master:7077"

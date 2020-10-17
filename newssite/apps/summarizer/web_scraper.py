@@ -3,15 +3,22 @@ import time
 
 from bs4 import BeautifulSoup
 from newspaper import Article
+from py4j.java_gateway import JavaGateway
+from pyspark import SparkConf, SparkContext
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+
+
+# conf = SparkConf().setAppName("Collinear Points")
+# sc = SparkContext('local', conf=conf)
+# gateway = JavaGateway()
 
 
 class Scraper:
     link_dict = {
         'verge': 'https://www.theverge.com/rss/index.xml',
-        'nyTimes_US': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
-        'wired_main': 'https://www.wired.com/feed/rss',
-        'cnet': 'https://www.cnet.com/rss/news/',
+        # 'nyTimes_US': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
+        # 'wired_main': 'https://www.wired.com/feed/rss',
+        # 'cnet': 'https://www.cnet.com/rss/news/',
     }
 
     verge_dict = {}
@@ -21,9 +28,9 @@ class Scraper:
 
     article_to_dict = {
         'verge': verge_dict,
-        'nyTimes_US': nyTime_dict,
-        'wired_main': wired_dict,
-        'cnet': cnet_dict,
+        # 'nyTimes_US': nyTime_dict,
+        # 'wired_main': wired_dict,
+        # 'cnet': cnet_dict,
     }
 
     articles = []
@@ -57,16 +64,16 @@ class Scraper:
                         article = Article(art_link)
                         article.download()
                         article.parse()
-                        self.articles.append(article.text)
-                        self.article_to_dict[site][article.title] = {'link': art_link, 'article_loc': i}
+                        # self.articles.append(article.text)
+                        self.article_to_dict[site][article.title] = {'link': art_link, 'article_loc': self.summarize((article.text))}
                         i += 1
                     except:
                         print(f'ERROR: {art_link}')
 
+            # arts_text = sc.parallelize(self.articles)
+            # arts_text.foreach(self.summarize)
             print(f'Finished Scraping {site}')
-
-        self.summarize()
-        self.update_articles_in_dict()
+        # self.update_articles_in_dict()
 
     def get_specific_site_articles(self, slug=None):
         if slug:
@@ -91,13 +98,13 @@ class Scraper:
                         'article_loc': self.articles[link_dict['article_loc']]
                     })
 
-    def summarize(self):
+    def summarize(self, art):
         print("Start Summarizing")
         start_time = time.time()
-        batch = self.tokenizer.prepare_seq2seq_batch(self.articles, max_target_length=100, padding='longest', truncation=True)
-        translated = self.model.generate(max_length=2, early_stopping=True, **batch)
+        batch = self.tokenizer.prepare_seq2seq_batch([art], max_target_length=100)
+        translated = self.model.generate(**batch)
         tgt_text = self.tokenizer.batch_decode(translated, skip_special_tokens=True)
         end_time = time.time()
         time_diff = end_time - start_time
-        self.articles = tgt_text
         print(f'TIME: {time_diff}')
+        return tgt_text

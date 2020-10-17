@@ -9,13 +9,21 @@
 <body>
 <div class="row">
     {%  for site, headline_dict in arts.items %}
-        <div class="col">
-            <h3>{{ site }}</h3>
-            {%  for headline, link_dict in headline_dict.items %}
-                <a href="{{ link_dict.link }}">{{ headline }}</a>
-                {{ link_dict.article_loc }}
-                <br/>
-            {%  endfor %}
+        <div class="row">
+            <div id="{{ site }}-carosel" class="carousel slide" data-ride="carousel">
+                 <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <p><b>{{ site }}</b></p>
+                    </div>
+                     {%  for headline, link_dict in headline_dict.items %}
+                        <div class="carousel-item">
+                             <p> <a href="{{ link_dict.link }}">{{ headline }}</a></p>
+                            <br/>
+                            <p>{{ link_dict.article_loc }}</p>
+                        </div>
+                    {% endfor %}
+                 </div>
+            </div>
         </div>
     {% endfor %}
 </div>
