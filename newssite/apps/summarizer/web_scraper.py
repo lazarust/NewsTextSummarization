@@ -4,7 +4,14 @@ import time
 
 from bs4 import BeautifulSoup
 from newspaper import Article
+from py4j.java_gateway import JavaGateway
+from pyspark import SparkConf, SparkContext
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+
+
+# conf = SparkConf().setAppName("Collinear Points")
+# sc = SparkContext('local', conf=conf)
+# gateway = JavaGateway()
 
 
 class Scraper:
@@ -87,6 +94,8 @@ class Scraper:
                     except:
                         print(f'ERROR: {art_link}')
 
+            # arts_text = sc.parallelize(self.articles)
+            # arts_text.foreach(self.summarize)
             print(f'Finished Scraping {site}')
         # Replaces the index value in article_to_dict[site][article.title][article_loc] to the summarized article string
         # self.update_articles_in_dict()
