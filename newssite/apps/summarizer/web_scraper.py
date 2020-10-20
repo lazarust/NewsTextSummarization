@@ -8,11 +8,16 @@ from py4j.java_gateway import JavaGateway
 from pyspark import SparkConf, SparkContext
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
+# Sets up PySpark Things
+conf = SparkConf().setAppName("Collinear Points")
+sc = SparkContext('local', conf=conf)
+gateway = JavaGateway()
 
-# conf = SparkConf().setAppName("Collinear Points")
-# sc = SparkContext('local', conf=conf)
-# gateway = JavaGateway()
 
+class Scraper:
+    """
+    This is the class to handle web scraping. It is able to read in and summarize news articles from preset rss feeds.
+    """
 
 class Scraper:
     """
@@ -94,8 +99,11 @@ class Scraper:
                     except:
                         print(f'ERROR: {art_link}')
 
-            # arts_text = sc.parallelize(self.articles)
-            # arts_text.foreach(self.summarize)
+                # Creates PySpark RDD and saves it in cache. Then maps the summarize function
+                arts_text = sc.parallelize(articles)
+                arts_text.cache()
+                arts_map = arts_text.map(lambda z: self.summarize(z))
+                self.articles.append(arts_map.collect())
             print(f'Finished Scraping {site}')
         # Replaces the index value in article_to_dict[site][article.title][article_loc] to the summarized article string
         # self.update_articles_in_dict()
