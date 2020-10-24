@@ -10,8 +10,29 @@
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <style>
+    :root {
+        --light: #E9EBE7;
+        --mid-light: #81827C;
+        --mid: #8D7077;
+        --mid-dark: #7E7F87;
+        --dark: #373B43;
+    }
+
     .carousel, h2{
         text-align: center;
+        color: var(--light);
+    }
+
+    a {
+        color: var(--mid)
+    }
+
+    body{
+        background: var(--dark);
+    }
+
+    .next-btns {
+        align-items: unset;
     }
 </style>
 <body>
@@ -30,16 +51,16 @@
                         <blockquote>
                             <h3> <a href="{{ link_dict.link }}">{{ headline }}</a></h3>
                             <br/>
-                            <h5>{{ link_dict.article_loc }}</h5>
+                            <h5>{{ link_dict.article_loc.0.0 }}</h5>
                         </blockquote>
                         </div>
                     {% endfor %}
                  </div>
-                <a class="carousel-control-prev" href="#{{ site }}-carousel" role="button" data-slide="prev">
+                <a class="carousel-control-prev next-btns" href="#{{ site }}-carousel" role="button" data-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="sr-only">Previous</span>
                 </a>
-                <a class="carousel-control-next" href="#{{ site }}-carousel" role="button" data-slide="next">
+                <a class="carousel-control-next next-btns" href="#{{ site }}-carousel" role="button" data-slide="next">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                     <span class="sr-only">Next</span>
                 </a>
