@@ -3,8 +3,6 @@ import time
 
 from bs4 import BeautifulSoup
 from newspaper import Article
-from py4j.java_gateway import JavaGateway
-from pyspark import SparkConf, SparkContext
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 
@@ -15,10 +13,10 @@ class Scraper:
 
     # link_dict is a dictionary of links where the key is a given news site's slug and the value is the rss feed's url
     link_dict = {
-        'verge': 'https://www.theverge.com/rss/index.xml',
-        # 'nyTimes_US': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
-        # 'wired_main': 'https://www.wired.com/feed/rss',
-        # 'cnet': 'https://www.cnet.com/rss/news/',
+        'The Verge': 'https://www.theverge.com/rss/index.xml',
+        'NY Times': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
+         'Wired': 'https://www.wired.com/feed/rss',
+        'CNET': 'https://www.cnet.com/rss/news/',
     }
 
     # individual dictionaries to store a given news site's articles, headlines, and links
@@ -29,10 +27,10 @@ class Scraper:
 
     # linking dictionary from slug to article dictionary
     article_to_dict = {
-        'verge': verge_dict,
-        # 'nyTimes_US': nyTime_dict,
-        # 'wired_main': wired_dict,
-        # 'cnet': cnet_dict,
+        'The Verge': verge_dict,
+        'NY Times': nyTime_dict,
+        'Wired': wired_dict,
+        'CNET': cnet_dict,
     }
 
     # list of all articles
@@ -48,16 +46,11 @@ class Scraper:
     # model for text summarization
     model = AutoModelForSeq2SeqLM.from_pretrained("apps/summarizer/model", local_files_only=True)
 
-    # Sets up PySpark Things
-    conf = SparkConf().setAppName("Web App").setMaster('spark://spark-master:7077')
-    SparkContext.setSystemProperty('spark.python.worker.memory', '2g')
-    sc = SparkContext('local', conf=conf)
-    gateway = JavaGateway
-
     def scrape_all_articles(self):
         """
         Scrapes in all articles from rss feeds in link_dict
         """
+        start_scrape = time.time()
         i = 0
         for site in self.link_dict:
             print(f'Started Scraping {site}')
@@ -67,9 +60,11 @@ class Scraper:
                 self.article_to_dict[site]["ERROR"] = "RSS feed responded with 404"
 
             soup = BeautifulSoup(res.text, 'xml')
-
-            for art in soup.findAll('link')[1:]:
-                articles = []
+            scraped_links = soup.findAll('link')[1:]
+            if len(scraped_links) > 10:
+                scraped_links = scraped_links[:10]
+            for art in scraped_links:
+                art_link = ""
                 if site != 'verge':
                     for x in art:
                         art_link = x
@@ -80,20 +75,17 @@ class Scraper:
                         article = Article(art_link)
                         article.download()
                         article.parse()
-                        articles.append(article.text)
-                        self.article_to_dict[site][article.title] = {'link': art_link, 'article_loc': i}
+                        self.article_to_dict[site][article.title] = {'link': art_link, 'article_loc': self.summarize(article.text)}
                         i += 1
                     except:
                         print(f'ERROR: {art_link}')
 
-                # Creates PySpark RDD and saves it in cache. Then maps the summarize function
-                arts_text = sc.parallelize(articles)
-                arts_text.cache()
-                arts_map = arts_text.map(lambda z: self.summarize(z))
-                self.articles.append(arts_map.collect())
             print(f'Finished Scraping {site}')
         # Replaces the index value in article_to_dict[site][article.title][article_loc] to the summarized article string
-        self.update_articles_in_dict()
+        # self.update_articles_in_dict()
+        end_scrape = time.time()
+        total_time = end_scrape - start_scrape
+        print(f'TOTAL TIME: {total_time}')
 
     def get_specific_site_articles(self, slug=None):
         """
