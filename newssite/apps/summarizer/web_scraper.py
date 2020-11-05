@@ -17,6 +17,7 @@ class Scraper:
         'NY Times': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
          'Wired': 'https://www.wired.com/feed/rss',
         'CNET': 'https://www.cnet.com/rss/news/',
+        'The Onion': 'https://www.theonion.com/rss',
     }
 
     # individual dictionaries to store a given news site's articles, headlines, and links
@@ -24,6 +25,7 @@ class Scraper:
     nyTime_dict = {}
     wired_dict = {}
     cnet_dict = {}
+    onion_dict = {}
 
     # linking dictionary from slug to article dictionary
     article_to_dict = {
@@ -31,6 +33,7 @@ class Scraper:
         'NY Times': nyTime_dict,
         'Wired': wired_dict,
         'CNET': cnet_dict,
+        'The Onion': onion_dict,
     }
 
     # list of all articles
