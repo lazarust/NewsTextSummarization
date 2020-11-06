@@ -1,15 +1,10 @@
-FROM python:3-buster
+FROM pytorch/pytorch:latest
 MAINTAINER Thomas Lazarus (Github: lazarust)
 
 ENV PYTHONUNUNBUFFERED 1
 
 RUN mkdir /newssite
 WORKDIR /newssite
-
-RUN apt-get update && \
-    apt-get install -y curl \
-    wget \
-    default-jdk
 
 COPY ./requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
