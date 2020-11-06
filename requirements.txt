@@ -8,4 +8,4 @@ django-bootstrap4==2.2.0
 schedule==0.6.0
 transformers==3.3.1
 --find-links https://download.pytorch.org/whl/torch_stable.html
-torch==1.6.0
+torch==1.6.0+cpu
