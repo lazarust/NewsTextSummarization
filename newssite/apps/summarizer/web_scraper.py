@@ -1,3 +1,4 @@
+import gc
 import requests
 import time
 
@@ -44,10 +45,13 @@ class Scraper:
                         'https://www.cnet.com/#ftag=CAD590a51e']
 
     # tokenizer for text summarization
-    tokenizer = AutoTokenizer.from_pretrained("google/pegasus-cnn_dailymail", use_fast=True)
+    tokenizer = AutoTokenizer.from_pretrained("apps/summarizer/model", local_files_only=True)
     # Make sure the file is unzipped
-    # model for text summarization
-    model = AutoModelForSeq2SeqLM.from_pretrained("apps/summarizer/model", local_files_only=True)
+
+    def __init__(self):
+        gc.collect()
+        # model for text summarization
+        self.model = AutoModelForSeq2SeqLM.from_pretrained("google/pegasus-cnn_dailymail", resume_download=True)
 
     def scrape_all_articles(self):
         """
