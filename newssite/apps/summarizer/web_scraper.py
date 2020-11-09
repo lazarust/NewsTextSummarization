@@ -14,11 +14,11 @@ class Scraper:
 
     # link_dict is a dictionary of links where the key is a given news site's slug and the value is the rss feed's url
     link_dict = {
-        'The Verge': 'https://www.theverge.com/rss/index.xml',
-        'NY Times': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
+        'TheVerge': 'https://www.theverge.com/rss/index.xml',
+        'NYTimes': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
          'Wired': 'https://www.wired.com/feed/rss',
         'CNET': 'https://www.cnet.com/rss/news/',
-        'The Onion': 'https://www.theonion.com/rss',
+        'TheOnion': 'https://www.theonion.com/rss',
     }
 
     # individual dictionaries to store a given news site's articles, headlines, and links
@@ -30,11 +30,11 @@ class Scraper:
 
     # linking dictionary from slug to article dictionary
     article_to_dict = {
-        'The Verge': verge_dict,
-        'NY Times': nyTime_dict,
+        'TheVerge': verge_dict,
+        'NYTimes': nyTime_dict,
         'Wired': wired_dict,
         'CNET': cnet_dict,
-        'The Onion': onion_dict,
+        'TheOnion': onion_dict,
     }
 
     # list of all articles
@@ -50,7 +50,8 @@ class Scraper:
         # Make sure the file is unzipped
         print(gc.collect())
         # model for text summarization
-        self.model = AutoModelForSeq2SeqLM.from_pretrained("google/pegasus-cnn_dailymail", resume_download=True)
+        self.model = AutoModelForSeq2SeqLM.from_pretrained("google/pegasus-cnn_dailymail")
+        gc.collect()
 
     def scrape_all_articles(self):
         """
@@ -71,7 +72,7 @@ class Scraper:
                 scraped_links = scraped_links[:10]
             for art in scraped_links:
                 art_link = ""
-                if site != 'verge':
+                if site != 'TheVerge':
                     for x in art:
                         art_link = x
                 else:
