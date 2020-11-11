@@ -9,8 +9,8 @@ WORKDIR /newssite
 COPY ./requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
 
-ENV PORT=8000
-EXPOSE 8000
+ENV PORT=80
+EXPOSE 80
 
 COPY ./newssite /newssite
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:80"]
