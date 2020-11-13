@@ -4,15 +4,8 @@ import time
 
 from bs4 import BeautifulSoup
 from newspaper import Article
-from py4j.java_gateway import JavaGateway
-from pyspark import SparkConf, SparkContext
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
-
-class Scraper:
-    """
-    This is the class to handle web scraping. It is able to read in and summarize news articles from preset rss feeds.
-    """
 
 class Scraper:
     """
@@ -60,11 +53,6 @@ class Scraper:
         self.model = AutoModelForSeq2SeqLM.from_pretrained("google/pegasus-cnn_dailymail")
         gc.collect()
 
-    # Sets up PySpark Things
-    conf = SparkConf().setAppName("Collinear Points")
-    sc = SparkContext('local', conf=conf)
-    gateway = JavaGateway
-
     def scrape_all_articles(self):
         """
         Scrapes in all articles from rss feeds in link_dict
@@ -99,14 +87,7 @@ class Scraper:
                     except:
                         print(f'ERROR: {art_link}')
 
-                # Creates PySpark RDD and saves it in cache. Then maps the summarize function
-                arts_text = self.sc.parallelize(articles)
-                arts_text.cache()
-                arts_map = arts_text.map(self.summarize)
-                self.articles.append(arts_map.collect())
             print(f'Finished Scraping {site}')
-        # Replaces the index value in article_to_dict[site][article.title][article_loc] to the summarized article string
-        # self.update_articles_in_dict()
         end_scrape = time.time()
         total_time = end_scrape - start_scrape
         print(f'TOTAL TIME: {total_time}')
