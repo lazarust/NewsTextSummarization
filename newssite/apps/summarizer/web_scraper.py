@@ -1,6 +1,7 @@
 import gc
 import requests
 import time
+import re
 
 from bs4 import BeautifulSoup
 from newspaper import Article
@@ -92,31 +93,11 @@ class Scraper:
         total_time = end_scrape - start_scrape
         print(f'TOTAL TIME: {total_time}')
 
-    def get_specific_site_articles(self, slug=None):
-        """
-        Takes in a slug and returns the summarized articles for just that slug
-        TODO: Remove the method if it is not needed
-        """
-        if slug:
-            return self.article_to_dict[slug]
-        else:
-            print("ERROR: Please Enter Slug")
-
     def get_all_site_articles(self):
         """
         Returns all the summarized articles
         """
         return self.article_to_dict
-
-    def get_all_site_slugs(self):
-        """
-        Returns a list of all the scraped site slugs
-        TODO: Remove the method if it is not needed
-        """
-        slug_list = []
-        for slug in self.link_dict:
-            slug_list.append(slug)
-        return slug_list
 
     def update_articles_in_dict(self):
         """
@@ -141,4 +122,4 @@ class Scraper:
         end_time = time.time()
         time_diff = end_time - start_time
         print(f'TIME: {time_diff}')
-        return tgt_text
+        return re.sub('<[^>]*>', "", tgt_text)
