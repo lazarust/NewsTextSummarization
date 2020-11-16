@@ -122,4 +122,4 @@ class Scraper:
         end_time = time.time()
         time_diff = end_time - start_time
         print(f'TIME: {time_diff}')
-        return re.sub('<[^>]*>', "", tgt_text)
+        return re.sub('<[^>]*>', "", tgt_text[0])
