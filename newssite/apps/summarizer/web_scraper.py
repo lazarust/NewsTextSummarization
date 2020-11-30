@@ -18,7 +18,7 @@ class Scraper:
         'TheVerge': 'https://www.theverge.com/rss/index.xml',
         'NYTimes': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
          'Wired': 'https://www.wired.com/feed/rss',
-        'CNET': 'https://www.cnet.com/rss/news/',
+        # 'CNET': 'https://www.cnet.com/rss/news/',
         'TheOnion': 'https://www.theonion.com/rss',
     }
 
@@ -34,7 +34,7 @@ class Scraper:
         'TheVerge': verge_dict,
         'NYTimes': nyTime_dict,
         'Wired': wired_dict,
-        'CNET': cnet_dict,
+        # 'CNET': cnet_dict,
         'TheOnion': onion_dict,
     }
 
