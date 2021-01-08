@@ -4,6 +4,7 @@ djangorestframework>=3.9.1
 # Packages for Web Scraper
 beautifulsoup4==4.9.1
 newspaper3k==0.2.8
+django-environ==0.4.5
 django-bootstrap4==2.2.0
 schedule==0.6.0
 transformers==3.3.1
