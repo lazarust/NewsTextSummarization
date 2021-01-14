@@ -8,8 +8,12 @@ WORKDIR /newssite
 
 RUN apt-get update && \
     apt-get install -y curl \
+    git \
+    python3-dev \
+    python3-pip \
     wget \
-    default-jdk
+    default-jdk \
+    default-libmysqlclient-dev
 
 COPY ./requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt

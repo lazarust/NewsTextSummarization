@@ -9,9 +9,10 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-import environ
 import os
 from pathlib import Path
+
+import environ
 
 root = environ.Path(__file__) - 3  # three folder back (/a/b/c/ - 3 = /)
 BASE_DIR = Path(root())
@@ -22,7 +23,7 @@ env.read_env(str(BASE_DIR.joinpath('.env')))
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DJANGO_DEBUG', False)
 
 ALLOWED_HOSTS = ['*']
 
@@ -75,8 +76,12 @@ WSGI_APPLICATION = 'newssite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'newssite',
+        'USER': 'root',
+        'PASSWORD': env('MYSQL_ROOT_PASSWORD'),
+        'HOST': env('MYSQL_URL'),
+        'PORT': '3306',
     }
 }
 

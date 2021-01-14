@@ -15,11 +15,12 @@ class Scraper:
 
     # link_dict is a dictionary of links where the key is a given news site's slug and the value is the rss feed's url
     link_dict = {
-        'TheVerge': 'https://www.theverge.com/rss/index.xml',
-        'NYTimes': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
-         'Wired': 'https://www.wired.com/feed/rss',
+        # 'TheVerge': 'https://www.theverge.com/rss/index.xml',
+        # 'TheVerge': 'https://www.theverge.com/rss/index.xml',
+        # 'NYTimes': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
+        # 'Wired': 'https://www.wired.com/feed/rss',
         # 'CNET': 'https://www.cnet.com/rss/news/',
-        'TheOnion': 'https://www.theonion.com/rss',
+        # 'TheOnion': 'https://www.theonion.com/rss',
     }
 
     # individual dictionaries to store a given news site's articles, headlines, and links

@@ -4,12 +4,14 @@ services:
   web:
     build:
       context: .
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     volumes:
       - ./newssite:/newssite
     command: python manage.py runserver 0.0.0.0:8000
-    restart: always
+    depends_on:
+      - db
   db:
     container_name: db
     command: [ mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci ]
