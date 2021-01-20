@@ -10,6 +10,10 @@ services:
     environment:
       - "MYSQL_ROOT_PASSWORD"
       - "MYSQL_DATABASE=newssite"
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
   web:
     container_name: web
     build:
@@ -21,6 +25,7 @@ services:
       - ./newssite:/newssite
     command: python manage.py runserver 0.0.0.0:8000
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     env_file:
       - .env
