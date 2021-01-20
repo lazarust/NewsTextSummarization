@@ -5,7 +5,7 @@ ENV PYTHONUNUNBUFFERED 1
 
 RUN mkdir /newssite
 WORKDIR /newssite
-
+# TODO: Some of these probably aren't necessary. Remove them. 
 RUN apt-get update && \
     apt-get install -y curl \
     git \

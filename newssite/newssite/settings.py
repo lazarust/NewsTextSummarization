@@ -14,7 +14,7 @@ from pathlib import Path
 import dj_database_url
 
 import environ
-
+# TODO: Find out if not directly reading in the .env file here instead of in docker-compose will cause issues. 
 root = environ.Path(__file__) - 1  # three folder back (/a/b/c/ - 3 = /)
 BASE_DIR = Path(root())
 env = environ.Env()
