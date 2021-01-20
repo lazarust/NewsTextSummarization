@@ -1,7 +1,17 @@
 version: "3.8"
 
 services:
+  db:
+    container_name: db
+    command: [ mysqld, --character-set-server=utf8mb4]
+    ports:
+      - "3306:3306"
+    image: mysql:5.7
+    environment:
+      - "MYSQL_ROOT_PASSWORD"
+      - "MYSQL_DATABASE=newssite"
   web:
+    container_name: web
     build:
       context: .
       dockerfile: Dockerfile
@@ -12,14 +22,5 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     depends_on:
       - db
-  db:
-    container_name: db
-    command: [ mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci ]
-    ports:
-      - "3306:3306"
-    image: mysql:8
-    environment:
-      - "MYSQL_ROOT_PASSWORD"
-      - "MYSQL_DATABASE=newssite"
-      - "MYSQL_USER=newssite"
-      - "MYSQL_PASSWORD"
+    env_file:
+      - .env

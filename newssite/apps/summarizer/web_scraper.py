@@ -48,11 +48,11 @@ class Scraper:
 
     def __init__(self):
         # tokenizer for text summarization
-        self.tokenizer = AutoTokenizer.from_pretrained("google/pegasus-cnn_dailymail", use_fast=True)
+        # self.tokenizer = AutoTokenizer.from_pretrained("google/pegasus-cnn_dailymail", use_fast=True)
         # Make sure the file is unzipped
         print(gc.collect())
         # model for text summarization
-        self.model = AutoModelForSeq2SeqLM.from_pretrained("google/pegasus-cnn_dailymail")
+        # self.model = AutoModelForSeq2SeqLM.from_pretrained("google/pegasus-cnn_dailymail")
         gc.collect()
 
     def scrape_all_articles(self):

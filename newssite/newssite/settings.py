@@ -11,13 +11,14 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
 from pathlib import Path
+import dj_database_url
 
 import environ
 
-root = environ.Path(__file__) - 3  # three folder back (/a/b/c/ - 3 = /)
+root = environ.Path(__file__) - 1  # three folder back (/a/b/c/ - 3 = /)
 BASE_DIR = Path(root())
 env = environ.Env()
-env.read_env(str(BASE_DIR.joinpath('.env')))
+# env.read_env(str(BASE_DIR.joinpath('.env')))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
@@ -74,16 +75,11 @@ WSGI_APPLICATION = 'newssite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'newssite',
-        'USER': 'root',
-        'PASSWORD': env('MYSQL_ROOT_PASSWORD'),
-        'HOST': env('MYSQL_URL'),
-        'PORT': '3306',
-    }
-}
+DB_NAME = env('DB_NAME')
+DB_PASSWORD = env('MYSQL_PASSWORD')
+DB_USER = env('DB_USER')
+DATABASES = {}
+DATABASES['default'] = env.db(default='mysql://{}:{}@localhost:3306/{}'.format(DB_USER, DB_PASSWORD, DB_NAME))
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
