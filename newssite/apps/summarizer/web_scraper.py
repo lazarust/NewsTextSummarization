@@ -1,49 +1,25 @@
 import gc
+import newspaper
+import re
 import requests
 import time
-import re
 
 from bs4 import BeautifulSoup
-from newspaper import Article
+from datetime import datetime
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+
+from .models import *
 
 
 class Scraper:
     """
     This is the class to handle web scraping. It is able to read in and summarize news articles from preset rss feeds.
     """
-
-    # link_dict is a dictionary of links where the key is a given news site's slug and the value is the rss feed's url
-    link_dict = {
-        # 'TheVerge': 'https://www.theverge.com/rss/index.xml',
-        # 'TheVerge': 'https://www.theverge.com/rss/index.xml',
-        # 'NYTimes': 'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
-        # 'Wired': 'https://www.wired.com/feed/rss',
-        # 'CNET': 'https://www.cnet.com/rss/news/',
-        # 'TheOnion': 'https://www.theonion.com/rss',
-    }
-
-    # individual dictionaries to store a given news site's articles, headlines, and links
-    verge_dict = {}
-    nyTime_dict = {}
-    wired_dict = {}
-    cnet_dict = {}
-    onion_dict = {}
-
-    # linking dictionary from slug to article dictionary
-    article_to_dict = {
-        'TheVerge': verge_dict,
-        'NYTimes': nyTime_dict,
-        'Wired': wired_dict,
-        # 'CNET': cnet_dict,
-        'TheOnion': onion_dict,
-    }
-
-    # list of all articles
-    articles = []
+    # Retrieves all the sites from the database
+    sites = Site.objects.all()
 
     # list of links that are frequent in rss feed but that don't need to be scraped
-    not_allowed_urls = ['https://www.nytimes.com', 'https://www.nytimes.com/section/us', 'https://www.wired.com',
+    invalid_urls = ['https://www.nytimes.com', 'https://www.nytimes.com/section/us', 'https://www.wired.com',
                         'https://www.cnet.com/#ftag=CAD590a51e']
 
     def __init__(self):
@@ -61,9 +37,10 @@ class Scraper:
         """
         start_scrape = time.time()
         i = 0
-        for site in self.link_dict:
-            print(f'Started Scraping {site}')
-            link = self.link_dict[site]
+        bulk_articles = []
+        for site in self.sites:
+            print(f'Started Scraping {site.name}')
+            link = site.url_feed
             res = requests.get(link)
             if res.status_code == 404:
                 self.article_to_dict[site]["ERROR"] = "RSS feed responded with 404"
@@ -79,17 +56,18 @@ class Scraper:
                         art_link = x
                 else:
                     art_link = art['href']
-                if art_link != link and art_link not in self.not_allowed_urls:
+                if art_link != link and art_link not in self.invalid_urls:
                     try:
-                        article = Article(art_link)
+                        article = newspaper.Article(art_link)
                         article.download()
                         article.parse()
-                        self.article_to_dict[site][article.title] = {'link': art_link, 'article_loc': self.summarize(article.text)}
+                        bulk_articles.append(Article(date=datetime.now(), site=site, summary=self.summarize(article.text), article_link=art_link, headline=article.title))
                         i += 1
                     except:
                         print(f'ERROR: {art_link}')
 
             print(f'Finished Scraping {site}')
+        Article.objects.bulk_create(bulk_articles)
         end_scrape = time.time()
         total_time = end_scrape - start_scrape
         print(f'TOTAL TIME: {total_time}')
