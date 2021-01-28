@@ -1,12 +1,37 @@
 version: "3.8"
 
 services:
+  db:
+    container_name: db
+    command: [ mysqld, --character-set-server=utf8mb4]
+    ports:
+      - "3306:3306"
+    image: mysql:5.7
+    environment:
+      - "MYSQL_ROOT_PASSWORD"
+      - "MYSQL_DATABASE=newssite"
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+    volumes:
+      - db-data:/var/lib/mysql
   web:
+    container_name: web
     build:
       context: .
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     volumes:
       - ./newssite:/newssite
     command: python manage.py runserver 0.0.0.0:8000
-    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      TERM: xterm-color
+volumes:
+  db-data:
