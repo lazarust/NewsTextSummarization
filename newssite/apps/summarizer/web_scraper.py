@@ -72,23 +72,6 @@ class Scraper:
         total_time = end_scrape - start_scrape
         print(f'TOTAL TIME: {total_time}')
 
-    def get_all_site_articles(self):
-        """
-        Returns all the summarized articles
-        """
-        return self.article_to_dict
-
-    def update_articles_in_dict(self):
-        """
-        Replaces index with article text in dictionary
-        """
-        for site, headline_dict in self.article_to_dict.items():
-            for headline, link_dict in headline_dict.items():
-                if isinstance(link_dict['article_loc'], int):
-                    link_dict.update({
-                        'article_loc': self.articles[link_dict['article_loc']]
-                    })
-
     def summarize(self, art):
         """
         Summarizes the passed in article text
