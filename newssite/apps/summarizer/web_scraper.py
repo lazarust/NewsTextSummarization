@@ -6,7 +6,8 @@ import time
 
 from bs4 import BeautifulSoup
 from datetime import datetime
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+from newspaper import Article
+from transformers import pipeline
 
 from .models import *
 
@@ -23,12 +24,8 @@ class Scraper:
                         'https://www.cnet.com/#ftag=CAD590a51e']
 
     def __init__(self):
-        # tokenizer for text summarization
-        # self.tokenizer = AutoTokenizer.from_pretrained("google/pegasus-cnn_dailymail", use_fast=True)
-        # Make sure the file is unzipped
-        print(gc.collect())
-        # model for text summarization
-        # self.model = AutoModelForSeq2SeqLM.from_pretrained("google/pegasus-cnn_dailymail")
+        # Pipeline for text summarization
+        self.pipeline = pipeline("summarization", model="google/pegasus-cnn_dailymail", tokenizer="google/pegasus-cnn_dailymail", framework="pt")
         gc.collect()
 
     def scrape_all_articles(self):
@@ -36,11 +33,11 @@ class Scraper:
         Scrapes in all articles from rss feeds in link_dict
         """
         start_scrape = time.time()
-        i = 0
         bulk_articles = []
-        for site in self.sites:
-            print(f'Started Scraping {site.name}')
-            link = site.url_feed
+        for site in self.link_dict:
+            articles = []
+            print(f'Started Scraping {site}')
+            link = self.link_dict[site]
             res = requests.get(link)
             if res.status_code == 404:
                 self.article_to_dict[site]["ERROR"] = "RSS feed responded with 404"
@@ -62,26 +59,27 @@ class Scraper:
                         article.download()
                         article.parse()
                         bulk_articles.append(Article(date=datetime.now(), site=site, summary=self.summarize(article.text), article_link=art_link, headline=article.title))
-                        i += 1
+                        articles.append(article.text)
                     except:
                         print(f'ERROR: {art_link}')
 
             print(f'Finished Scraping {site}')
-        Article.objects.bulk_create(bulk_articles)
+            Article.objects.bulk_create(bulk_articles)
+            print(f'Summarizing {site}')
+            self.summarize(articles)
+            print(f'Finished Summarizing {site}')
         end_scrape = time.time()
         total_time = end_scrape - start_scrape
         print(f'TOTAL TIME: {total_time}')
 
-    def summarize(self, art):
+    def summarize(self, arts):
         """
         Summarizes the passed in article text
         """
-        print("Start Summarizing")
+        print("Start")
         start_time = time.time()
-        batch = self.tokenizer.prepare_seq2seq_batch([art], max_target_length=100)
-        translated = self.model.generate(**batch)
-        tgt_text = self.tokenizer.batch_decode(translated, skip_special_tokens=True)
+        tgt_text = self.pipeline(arts)
         end_time = time.time()
         time_diff = end_time - start_time
-        print(f'TIME: {time_diff}')
-        return re.sub('<[^>]*>', "", tgt_text[0])
+        print(f'Finish TIME: {time_diff}')
+        return tgt_text
