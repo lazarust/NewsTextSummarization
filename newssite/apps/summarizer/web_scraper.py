@@ -43,6 +43,9 @@ class Scraper:
 
             soup = BeautifulSoup(res.text, 'xml')
             scraped_links = soup.findAll('link')[1:]
+
+            headline_list = Article.objects.filter(site=site).values_list('headline', flat=True)
+
             if len(scraped_links) > 10:
                 scraped_links = scraped_links[:10]
             for art in scraped_links:
@@ -57,7 +60,8 @@ class Scraper:
                         article = newspaper.Article(art_link)
                         article.download()
                         article.parse()
-                        bulk_articles.append(Article(date=datetime.now(), site=site, summary=self.summarize(article.text), article_link=art_link, headline=article.title))
+                        if article.title not in headline_list:
+                            bulk_articles.append(Article(date=datetime.now(), site=site, summary=self.summarize(article.text), article_link=art_link, headline=article.title))
                     except:
                         print(f'ERROR: {art_link}')
 
@@ -73,8 +77,10 @@ class Scraper:
         """
         print("Start")
         start_time = time.time()
+        if len(art) > 1024:
+            art = art[:1024]
         tgt_texts = self.pipeline(art)
         end_time = time.time()
         time_diff = end_time - start_time
         print(f'Finish TIME: {time_diff}')
-        return tgt_texts
+        return tgt_texts[0]['summary_text']
