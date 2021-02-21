@@ -6,7 +6,8 @@ import time
 
 from bs4 import BeautifulSoup
 from datetime import datetime
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+from newspaper import Article
+from transformers import pipeline
 
 from .models import *
 
@@ -23,12 +24,8 @@ class Scraper:
                         'https://www.cnet.com/#ftag=CAD590a51e']
 
     def __init__(self):
-        # tokenizer for text summarization
-        # self.tokenizer = AutoTokenizer.from_pretrained("google/pegasus-cnn_dailymail", use_fast=True)
-        # Make sure the file is unzipped
-        print(gc.collect())
-        # model for text summarization
-        # self.model = AutoModelForSeq2SeqLM.from_pretrained("google/pegasus-cnn_dailymail")
+        # Pipeline for text summarization
+        self.pipeline = pipeline("summarization", model="google/pegasus-cnn_dailymail", tokenizer="google/pegasus-cnn_dailymail", framework="pt")
         gc.collect()
 
     def scrape_all_articles(self):
@@ -36,22 +33,24 @@ class Scraper:
         Scrapes in all articles from rss feeds in link_dict
         """
         start_scrape = time.time()
-        i = 0
         bulk_articles = []
         for site in self.sites:
-            print(f'Started Scraping {site.name}')
+            print(f'Started Scraping {site}')
             link = site.url_feed
             res = requests.get(link)
             if res.status_code == 404:
-                self.article_to_dict[site]["ERROR"] = "RSS feed responded with 404"
+                print(f"RSS feed responded with 404: {site}")
 
             soup = BeautifulSoup(res.text, 'xml')
             scraped_links = soup.findAll('link')[1:]
+
+            headline_list = Article.objects.filter(site=site).values_list('headline', flat=True)
+
             if len(scraped_links) > 10:
                 scraped_links = scraped_links[:10]
             for art in scraped_links:
                 art_link = ""
-                if site != 'TheVerge':
+                if site.slug != 'the-verge':
                     for x in art:
                         art_link = x
                 else:
@@ -61,13 +60,13 @@ class Scraper:
                         article = newspaper.Article(art_link)
                         article.download()
                         article.parse()
-                        bulk_articles.append(Article(date=datetime.now(), site=site, summary=self.summarize(article.text), article_link=art_link, headline=article.title))
-                        i += 1
+                        if article.title not in headline_list:
+                            bulk_articles.append(Article(date=datetime.now(), site=site, summary=self.summarize(article.text), article_link=art_link, headline=article.title))
                     except:
                         print(f'ERROR: {art_link}')
 
             print(f'Finished Scraping {site}')
-        Article.objects.bulk_create(bulk_articles)
+            Article.objects.bulk_create(bulk_articles)
         end_scrape = time.time()
         total_time = end_scrape - start_scrape
         print(f'TOTAL TIME: {total_time}')
@@ -76,12 +75,12 @@ class Scraper:
         """
         Summarizes the passed in article text
         """
-        print("Start Summarizing")
+        print("Start")
         start_time = time.time()
-        batch = self.tokenizer.prepare_seq2seq_batch([art], max_target_length=100)
-        translated = self.model.generate(**batch)
-        tgt_text = self.tokenizer.batch_decode(translated, skip_special_tokens=True)
+        if len(art) > 1024:
+            art = art[:1024]
+        tgt_texts = self.pipeline(art)
         end_time = time.time()
         time_diff = end_time - start_time
-        print(f'TIME: {time_diff}')
-        return re.sub('<[^>]*>', "", tgt_text[0])
+        print(f'Finish TIME: {time_diff}')
+        return tgt_texts[0]['summary_text']

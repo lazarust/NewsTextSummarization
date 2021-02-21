@@ -4,7 +4,7 @@ from django.db import models
 # Class to handle each site
 class Site(models.Model):
     name = models.TextField(null=False, blank=True)
-    slug = models.SlugField(null=False, blank=True)
+    slug = models.SlugField(null=False, blank=True, unique=True)
     url_feed = models.TextField(null=False, blank=True)
 
     class Meta(object):
@@ -17,8 +17,8 @@ class Article(models.Model):
     date = models.DateField()
     site = models.ForeignKey(Site, blank=True, null=True, on_delete=models.SET_NULL)
     summary = models.TextField()
-    article_link = models.TextField()
-    headline = models.TextField()
+    article_link = models.CharField(max_length=255, unique=True)
+    headline = models.CharField(max_length=255, unique=True)
 
     class Meta(object):
         verbose_name = "Article"
