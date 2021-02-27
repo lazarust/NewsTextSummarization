@@ -1,6 +1,7 @@
 from django.views.generic import TemplateView
-from .web_scraper import Scraper
 import schedule
+
+from newssite.apps.base.utils.scraper import Scraper
 
 
 class NewsList(TemplateView):
