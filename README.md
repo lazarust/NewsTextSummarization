@@ -1,18 +1,27 @@
 # News Text Summarization
 
-## Proof of Concept (Milestone 1)
-I completed the proof of concept in a Kaggle notebook that can be found [here](https://www.kaggle.com/thomaslazarus/summarization-comparison). I ran a article summarization using the T5, BERT, GPT, DistilBERT, GPT2, and Pegasus. I should probably look at a concrete way to define correct summarizations to better choose the model to use.
+## The Project
 
-## Web Scraper (Milestone 2)
-The scraper can be found in `newssite/newssite/apps/news/web_scraper.py`. The scraper checks the rss feeds of The Verge, NY Times, Wired, CNET, and The Onion. More sites can be implemented relativley simply. 
+### The Idea
+The basic premise for this project was for my Capstone to get my B.S. in Computer Science. I wanted to create a site that would show summarized news articles since
+it there is so much and lot of people don't have to the time to read them all. The proof of concept Jupyter Notebook can be found [here](https://github.com/lazarust/JupyterNotebooks/tree/main/NewsSummarization).
 
-## Model Implementation (Milestone 3)
-The model will be automatically downloaded when the server starts. Decided to use [Google's Pegasus](https://ai.googleblog.com/2020/06/pegasus-state-of-art-model-for.html) model pretrianed on CNN Dailymail dataset. This dataset was ideal for this implementation of the model because the training data was very similar to the data that was being summarized. 
+#### Current News Sites
+These are the current sites that are scraped and summarized:
+* The Verge
+* NY Times
+* Wired
+* CNET
+* The Onion
 
-## Front-End Implementation (Milestone 4)
-After spending some time trying to get a stable and reliable deployment working on google kubernetes engine (GKE), I have decided to just run it locally for now.
-The costs associated with keeping the compute clusters running using GKE were starting to pile up and since I was not able to 
-reliably use the service to create a live deployment of the app, I do not believe I will have the time to trouble shoot it before presenting.
+### The Future
+Even though this project was originally just for my capstone project I plan to continue to work on it to practice my programming skills. 
+Some future things I plan to work on and am currently working on:
+* Adding VueX as the front end framework
+* Create an API to show previous articles
+* Add more sites
+* Fix the linter
+* Deploy the sites to AWS or GCP
 
 ## Local Environment
 Since this application is using containers via Docker you'll need to start by downloading and installing [Docker](https://www.docker.com/get-started). From there you have wo options. 
@@ -26,4 +35,4 @@ Since this application is using containers via Docker you'll need to start by do
     * Navigate to the cloned repository
     * Run `docker-compose run`
     
- **NOTE: The server takes on average 25-30 minutes to start. This is due to it scraping and summarizing all articles on start.**
+**NOTE: The server takes on average 25-30 minutes to start. This is due to it scraping and summarizing all articles on start.**

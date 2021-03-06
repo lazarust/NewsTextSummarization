@@ -8,7 +8,7 @@ from datetime import datetime
 from newspaper import Article
 from transformers import pipeline
 
-from ...apps.summarizer.models import *
+from ...summarizer.models import Site
 
 
 class Scraper:
