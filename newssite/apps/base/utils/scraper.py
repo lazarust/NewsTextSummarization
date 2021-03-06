@@ -1,6 +1,5 @@
 import gc
 import newspaper
-import re
 import requests
 import time
 
@@ -9,7 +8,7 @@ from datetime import datetime
 from newspaper import Article
 from transformers import pipeline
 
-from .models import *
+from ...summarizer.models import Site
 
 
 class Scraper:
