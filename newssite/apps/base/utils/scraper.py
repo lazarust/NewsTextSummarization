@@ -42,7 +42,6 @@ class Scraper:
 
             soup = BeautifulSoup(res.text, 'xml')
             scraped_links = soup.findAll('link')[1:]
-
             headline_list = Article.objects.filter(site=site).values_list('headline', flat=True)
 
             if len(scraped_links) > 10:
@@ -66,6 +65,7 @@ class Scraper:
 
             print(f'Finished Scraping {site}')
             Article.objects.bulk_create(bulk_articles)
+            gc.collect()
         end_scrape = time.time()
         total_time = end_scrape - start_scrape
         print(f'TOTAL TIME: {total_time}')
