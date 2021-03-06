@@ -16,8 +16,8 @@ RUN apt-get update && \
     default-libmysqlclient-dev \
     mysql-client
 
-COPY ./requirements.txt /requirements.txt
+COPY requirements.txt ./
 RUN pip install -r /requirements.txt
 
-COPY ./newssite /newssite
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+COPY . .
+#CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
