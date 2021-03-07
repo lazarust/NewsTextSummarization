@@ -132,3 +132,5 @@ dmypy.json
 .idea/
 
 newssite/apps/summarizer/model/
+
+apps/summarizer/model/
