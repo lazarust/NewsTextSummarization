@@ -31,7 +31,7 @@ Since this application is using containers via Docker you'll need to start by do
     * Navigate to the cloned repository
     * Run `docker build`
     * Run `docker run python manage.py runserver 0.0.0.0:8000`
-2. Using [docker-compsoe](https://docs.docker.com/compose/install/)
+2. Using [docker-compose](https://docs.docker.com/compose/install/)
     * Navigate to the cloned repository
     * Run `docker-compose run`
     
